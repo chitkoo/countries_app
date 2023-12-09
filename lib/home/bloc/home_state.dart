@@ -15,6 +15,10 @@ class HomeState extends Equatable {
   @override
   List<Object> get props => [apiStatus, countries];
 
+
+  factory HomeState.fromJson(Map<String,dynamic> json) => _$HomeStateFromJson(json);
+  Map<String,dynamic> toJson () => _$HomeStateToJson(this);
+ 
   HomeState copyWith({
     ApiStatus? apiStatus,
     List<Country>? countries,

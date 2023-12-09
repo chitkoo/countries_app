@@ -1,15 +1,16 @@
-import 'package:bloc/bloc.dart';
 import 'package:country_app/repository/repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 import '../../models/models.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
+part 'home_bloc.g.dart';
 
-class HomeBloc extends Bloc<HomeEvent, HomeState> {
+class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
   HomeBloc({
     required AppRepository appRepository,
   })  : _appRepository = appRepository,
@@ -23,6 +24,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     GetCountries event,
     Emitter<HomeState> emit,
   ) async {
+    if (state.apiStatus == ApiStatus.succeed && state.countries.isNotEmpty) {
+      return;
+    }
+
     emit(state.copyWith(apiStatus: ApiStatus.loading));
     try {
       List<Country> response = await _appRepository.getCountries();
@@ -40,4 +45,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(apiStatus: ApiStatus.failed));
     }
   }
+
+  @override
+  HomeState? fromJson(Map<String, dynamic> json) => HomeState.fromJson(json);
+
+  @override
+  Map<String, dynamic>? toJson(HomeState state) => state.toJson();
 }
